@@ -1,10 +1,14 @@
 from time import time
-
+from hashlib import sha256
 class transaction:
+    counter = 1
+
     def __init__(self, origem, destino, valor):
         self.origem = origem
         self.destino = destino
         self.valor = valor
+        self.id = transaction.counter
+        transaction.counter += 1
 
     def stringfi(self):
         return self.origem + self.destino + str(self.valor)
