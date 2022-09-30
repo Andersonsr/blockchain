@@ -1,5 +1,4 @@
 from hashlib import sha256
-from random import randint
 
 #referencia: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
 def isPow2(n):
@@ -18,7 +17,7 @@ def merkleStep(hashes):
 
     else:
         temp = hashes[0]+hashes[1]
-        print('raiz merkle: ' + sha256(temp.encode()).hexdigest())
+        print('raiz merkle: {}'.format(sha256(temp.encode()).hexdigest()))
         return sha256(temp.encode()).hexdigest()
 
 
@@ -31,7 +30,3 @@ def merkle(transactions):
             hashes.append(digest)
 
         return merkleStep(hashes)
-
-    else:
-        return False
-

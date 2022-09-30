@@ -32,7 +32,7 @@ class miner:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', dest='dificuldade', default=4, type=int)
+    parser.add_argument('-d', dest='dificuldade', default=2, type=int)
     parser.add_argument('-b', dest='blocos', default=10, type=int)
     args = parser.parse_args()
 
@@ -41,8 +41,7 @@ if __name__ == '__main__':
     for i in range(args.blocos):
         print('gerando bloco ' + str(i+1) + '...')
         transactions = []
-        pow2 = [2**i for i in range(1, 10)]
-        n = pow2[randint(0, len(pow2)-1)]
+        n = int(2**randint(1, 9))
         for j in range(n):
             origem = sha256(str(randint(0, 100)).encode()).hexdigest()
             destino = sha256(str(randint(100, 200)).encode()).hexdigest()
