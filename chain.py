@@ -18,5 +18,12 @@ class chain:
         next = self.lastBlock
         while next != '':
             block = self.blocks[next]
+            print('bloco:')
             print(block.stringfi())
+            print('\ntransacoes:')
+            for e in block.transactions:
+                print(e.printable())
+                print(e.signOrigem)
+                print(e.signDestino)
+                print('')
             next = block.anterior

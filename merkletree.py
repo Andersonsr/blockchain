@@ -26,7 +26,7 @@ def merkle(transactions):
         n = len(transactions)
         hashes = []
         for i in range(n):
-            digest = sha256(transactions[i].stringfi().encode()).hexdigest()
+            digest = sha256(transactions[i].stringfi()).hexdigest()
             hashes.append(digest)
 
         return merkleStep(hashes)
