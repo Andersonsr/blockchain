@@ -1,13 +1,13 @@
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
-from binascii import hexlify
 import base64
 import base58
 import codecs
 import hashlib
 
 
-class RSAKeys():
+
+class User():
 
     def __init__(self):
         self.private_key = RSA.generate(1024)
@@ -26,6 +26,7 @@ class RSAKeys():
     def writeKeysToFiles(self, filePrefix):
         _private_pem = self.private_key.export_key().decode()
         _public_pem = self.public_key.export_key().decode()
+        print(filePrefix)
         with open(filePrefix + "_priv.pem", 'w') as _priv_key:
             _priv_key.write(_private_pem)
         with open(filePrefix + "_pub.pem", 'w') as _pub_key:
@@ -96,48 +97,10 @@ class RSAKeys():
 
 
 def main():
-    keys = RSAKeys()
-
-    message = b'secret message'
-
-    # str
-    print("** raw string **")
-    cipher_text = keys.encrypt(message)
-    print(cipher_text)
-    print(keys.decrypt(cipher_text))
-    print("")
-
-    # base64
-    print("** base64 string **")
-    cipher_text = keys.encryptBase64(message)
-    print(cipher_text)
-    print(keys.decryptBase64(cipher_text))
-    print("")
-
-    keys.writeKeysToFiles("rsa_key")
-    keys.readKeysFromFiles("rsa_key_priv.pem", "rsa_key_pub.pem")
-    # keys.printKeysPEM()
-
-    # hex
-    print("** hex string **")
-    cipher_text = keys.encryptHex(message)
-    print(cipher_text)
-    print(keys.decryptHex(cipher_text))
-    print("")
-
-    # Latin1
-    # print("** latin1 string **")
-    # cipher_text = keys.encryptLatin1(message)
-    # print(cipher_text)
-    # print(keys.decryptLatin1(cipher_text))
-    # print("")
-
-    print("pub key as address: " + keys.pubKeyAsAddress().decode())
-
-    print("")
-    signature = keys.sign(message)
-    print("signature: " + signature)
-    print("verify signature: " + str(keys.verify(message, signature)))
+    for i in range(50):
+        user = User()
+        address = user.pubKeyAsAddress()
+        user.writeKeysToFiles('users/{}'.format(address.decode()))
 
 
 if __name__ == "__main__":
