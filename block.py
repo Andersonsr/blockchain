@@ -1,30 +1,14 @@
+import json
 from sys import getsizeof as size
 from datetime import datetime
 from merkletree import merkle, isPow2
+from transaction import Transaction
 
-class transaction:
+class Block:
 
-    def __init__(self, origem, destino, valor, troco, signOrigem, signDestino):
-        self.origem = origem
-        self.destino = destino
-        self.valor = valor
-        self.troco = troco
-        self.signOrigem = signOrigem
-        self.signDestino = signDestino
-
-    def stringfi(self):
-        return (str(self.origem.n) + str(self.destino.n) + str(self.valor) + self.troco).encode() \
-               + self.signOrigem + self.signDestino
-
-    def printable(self):
-        return 'origem: ' + str(self.origem.n) + ' destino: ' + str(self.destino.n) + ' valor: ' + str(self.valor) \
-               + ' troco: ' + self.troco
-
-
-class block:
     def __init__(self, transactions, nonce, hash, dificuldade):
         if isPow2(len(transactions)) and len(transactions) <= 512:
-            self.timeStamp = datetime.now()
+            self.timeStamp = datetime.now().strftime('%d%m%Y')
             self.nonce = nonce
             self.transactions = transactions
             self.quantidade = len(transactions)
@@ -32,15 +16,32 @@ class block:
             self.anterior = None
             self.raizMerkle = merkle(transactions)
             self.dificuldade = dificuldade
-            self.blockSize = size(self.timeStamp) + size(self.nonce) + size(transactions) + size(self.quantidade)\
-                             + size(self.hash)*2 + size(self.raizMerkle) + size(dificuldade)
+            self.blockSize = size(self.timeStamp) + size(self.nonce) + size(transactions) + size(self.quantidade) \
+                             + size(self.hash) * 2 + size(self.raizMerkle) + size(dificuldade)
 
         else:
             raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512")
 
-    def stringfi(self):
-        return 'hash: ' + self.hash + ' timestamp: ' + str(self.timeStamp) + ' nonce: ' + \
-               str(self.nonce) + ' quantidade de transacoes: ' + str(self.quantidade) + ' raiz merkle: ' \
-               + self.raizMerkle + ' dificuldade: ' + str(self.dificuldade) + ' tamanho do bloco: ' \
-               + str(self.blockSize)
+    def toJson(self):
+        return json.dumps({'timestamp': self.timeStamp,
+                           'nonce': self.nonce,
+                           'transactions': [t.toJson() for t in self.transactions],
+                           'quantidade': self.quantidade,
+                           'hash': self.hash,
+                           'anterior': self.anterior,
+                           'raiz': self.raizMerkle,
+                           'dificuldade': self.dificuldade,
+                           'size': self.blockSize
+                           },
+                          indent=4,
+                          )
 
+
+if __name__ == '__main__':
+    trans = []
+    for i in range(4):
+        t1 = Transaction('1234543', 'dedasdeasd', 18.1, 'daedjkljkd', 'dadeokogj', 'lkjoeas')
+        trans.append(t1)
+
+    b1 = Block(trans, 12, 'sdaekdaklelas', 2)
+    print(b1.toJson())

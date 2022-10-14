@@ -1,10 +1,12 @@
 from hashlib import sha256
 
-#referencia: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
+
+# referencia: https://stackoverflow.com/questions/57025836/how-to-check-if-a-given-number-is-a-power-of-two
 def isPow2(n):
     return (n != 0) and (n & (n-1) == 0)
 
-def merkleStep(hashes):
+
+def merkleRecStep(hashes):
     n = int(len(hashes)/2)
     print(hashes)
     if n > 1:
@@ -13,7 +15,7 @@ def merkleStep(hashes):
             temp = hashes[i*2]+hashes[i*2+1]
             newHashes.append(sha256(temp.encode()).hexdigest())
 
-        return merkleStep(newHashes)
+        return merkleRecStep(newHashes)
 
     else:
         temp = hashes[0]+hashes[1]
@@ -26,7 +28,7 @@ def merkle(transactions):
         n = len(transactions)
         hashes = []
         for i in range(n):
-            digest = sha256(transactions[i].stringfi()).hexdigest()
+            digest = sha256(transactions[i].toString().encode()).hexdigest()
             hashes.append(digest)
 
-        return merkleStep(hashes)
+        return merkleRecStep(hashes)

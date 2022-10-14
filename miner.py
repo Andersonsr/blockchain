@@ -3,7 +3,7 @@ from hashlib import sha256
 
 
 
-class miner:
+class Miner:
 
     def check(self, hash, dificuldade):
         for i in range(dificuldade):
@@ -15,7 +15,7 @@ class miner:
         nonce = 0
         input = ''.encode()
         for t in transactions:
-            input += t.stringfi()
+            input += t.toBytes()
 
         while True:
             digest = sha256(input+str(nonce).encode()).hexdigest()

@@ -19,11 +19,10 @@ class chain:
         while next != '':
             block = self.blocks[next]
             print('bloco:')
-            print(block.stringfi())
+            print(block.toCsv())
             print('\ntransacoes:')
             for e in block.transactions:
-                print(e.printable())
-                print(e.signOrigem)
-                print(e.signDestino)
-                print('')
+                print(e.toString())
+
             next = block.anterior
+

@@ -1,3 +1,4 @@
+import os
 from Crypto.Cipher import PKCS1_OAEP
 from Crypto.PublicKey import RSA
 import base64
@@ -6,12 +7,17 @@ import codecs
 import hashlib
 
 
-
 class User():
 
     def __init__(self):
         self.private_key = RSA.generate(1024)
         self.public_key = self.private_key.publickey()
+        self.e_cipher = PKCS1_OAEP.new(key=self.public_key)
+        self.d_cipher = PKCS1_OAEP.new(key=self.private_key)
+
+    def __init__(self, dir):
+        self.private_key = RSA.import_key(open(dir + '_priv.pem', 'r').read())
+        self.public_key = RSA.import_key(open(dir + '_pub.pem', 'r').read())
         self.e_cipher = PKCS1_OAEP.new(key=self.public_key)
         self.d_cipher = PKCS1_OAEP.new(key=self.private_key)
 
@@ -27,9 +33,9 @@ class User():
         _private_pem = self.private_key.export_key().decode()
         _public_pem = self.public_key.export_key().decode()
         print(filePrefix)
-        with open(filePrefix + "_priv.pem", 'w') as _priv_key:
+        with open(filePrefix + "_priv.pem", 'w+') as _priv_key:
             _priv_key.write(_private_pem)
-        with open(filePrefix + "_pub.pem", 'w') as _pub_key:
+        with open(filePrefix + "_pub.pem", 'w+') as _pub_key:
             _pub_key.write(_public_pem)
 
     def readKeysFromFiles(self, privKeyFile, pubKeyFile):
@@ -100,7 +106,10 @@ def main():
     for i in range(50):
         user = User()
         address = user.pubKeyAsAddress()
-        user.writeKeysToFiles('users/{}'.format(address.decode()))
+        path = 'users/{}'.format(address.decode())
+        if not os.path.exists(path):
+            os.makedirs(path)
+        user.writeKeysToFiles('users/{}/'.format(address.decode()))
 
 
 if __name__ == "__main__":
