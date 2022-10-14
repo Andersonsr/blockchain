@@ -22,6 +22,10 @@ class Block:
         else:
             raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512")
 
+    def toString(self):
+        return 'timestamp: {} hash: {} nonce: {} root: {} blocks: {} size: {}'.format(
+            self.timeStamp, self.hash, self.nonce, self.raizMerkle, self.quantidade, self.blockSize)
+
     def toJson(self):
         return json.dumps({'timestamp': self.timeStamp,
                            'nonce': self.nonce,

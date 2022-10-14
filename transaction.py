@@ -16,14 +16,15 @@ class Transaction:
                                      self.signDestino)
 
     def toJson(self):
-        return json.dumps({'origem': self.origem,
+        return {'origem': self.origem,
                            'destino': self.destino,
                            'valor': self.valor,
-                           'troco': self.troco,
+                           'troco': self.troco.decode(),
                            'signOrigem': self.signOrigem,
-                           'signDestino': self.signDestino},
-                          indent=4
-                          )
+                           'signDestino': self.signDestino }
+
+
+
 
 
 if __name__ == '__main__':

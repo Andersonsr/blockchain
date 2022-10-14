@@ -9,7 +9,7 @@ class Manager:
         self.users = []
 
     def randomUser(self):
-        return self.users[randint(0, len(self.users))]
+        return self.users[randint(0, len(self.users) - 1)]
 
     def loadUsers(self):
         for e in self.usersAddr:
