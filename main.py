@@ -14,7 +14,7 @@ if __name__ == '__main__':
     parser.add_argument('-d', dest='minDifficulty', default=2, type=int, help='dificuldade minima')
     parser.add_argument('-m', dest='maxDifficulty', default=5, type=int, help='dificuldade maxima')
     parser.add_argument('-b', dest='blocks', default=10, type=int, help='numero de blocos')
-    parser.add_argument('-o', dest='output', default='test', type=str, help='nome do arquivo de saida')
+    parser.add_argument('-o', dest='output', default='', type=str, help='nome do arquivo de saida')
     parser.add_argument('-i', dest='input', default='', type=str, help='nome do arquivo de entrada')
     parser.add_argument('-t', dest='minTransactions', default=2, type=int, help='minimo de transacoes por bloco')
     parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximo de transacoes por bloco')
@@ -29,7 +29,6 @@ if __name__ == '__main__':
         for i in range(args.blocks):
             if not (isPow2(args.minTransactions) and isPow2(args.maxTransactions)):
                 raise Exception("o numero maximo e minimo de transacoes precisa ser potencia de 2")
-                break
 
             quantity = 2**(randint(int(log2(args.minTransactions)), int(log2(args.maxTransactions))))
             difficulty = int(randint(args.minDifficulty, args.maxDifficulty))
@@ -38,7 +37,7 @@ if __name__ == '__main__':
                 valor = randint(100, 100000)/10
                 sender = manager.randomUser()
                 receiver = manager.randomUser()
-                message = sender.pubKeyPEM() + receiver.pubKeyPEM() + str(valor) # + sender.pubKeyAsAddress()
+                message = sender.pubKeyPEM() + receiver.pubKeyPEM() + str(valor) + sender.pubKeyAsAddress().decode()
                 transactions.append(Transaction(sender.pubKeyPEM(), receiver.pubKeyPEM(), valor,
                                                 sender.pubKeyAsAddress(), sender.sign(message.encode()),
                                                 receiver.sign(message.encode())))

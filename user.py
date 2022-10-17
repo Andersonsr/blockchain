@@ -9,15 +9,14 @@ import hashlib
 
 class User():
 
-    def __init__(self):
-        self.private_key = RSA.generate(1024)
-        self.public_key = self.private_key.publickey()
-        self.e_cipher = PKCS1_OAEP.new(key=self.public_key)
-        self.d_cipher = PKCS1_OAEP.new(key=self.private_key)
+    def __init__(self, dir=None):
+        if dir!= None:
+            self.private_key = RSA.import_key(open(dir + '_priv.pem', 'r').read())
+            self.public_key = RSA.import_key(open(dir + '_pub.pem', 'r').read())
+        else:
+            self.private_key = RSA.generate(1024)
+            self.public_key = self.private_key.publickey()
 
-    def __init__(self, dir):
-        self.private_key = RSA.import_key(open(dir + '_priv.pem', 'r').read())
-        self.public_key = RSA.import_key(open(dir + '_pub.pem', 'r').read())
         self.e_cipher = PKCS1_OAEP.new(key=self.public_key)
         self.d_cipher = PKCS1_OAEP.new(key=self.private_key)
 
