@@ -50,7 +50,8 @@ class Chain:
                             transactions.append(newT)
                         block = Block(transactions=transactions, nonce=data['nonce'], hash=data['hash'],
                                       difficulty=data['difficulty'], timestamp=data['timeStamp'],
-                                      previous=data['previous'], root=data['root'])
+                                      previous=data['previous'], root=data['root'], quantity=data['quantity'],
+                                      size=data['size'])
                         self.blocks[block.hash] = block
 
     def printAll(self):

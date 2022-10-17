@@ -8,7 +8,7 @@ def isPow2(n):
 
 def merkleRecStep(hashes):
     n = int(len(hashes)/2)
-    print(hashes)
+    # print(hashes)
     if n > 1:
         newHashes = []
         for i in range(n):
@@ -19,7 +19,7 @@ def merkleRecStep(hashes):
 
     else:
         temp = hashes[0]+hashes[1]
-        print('raiz merkle: {}'.format(sha256(temp.encode()).hexdigest()))
+        # print('raiz merkle: {}'.format(sha256(temp.encode()).hexdigest()))
         return sha256(temp.encode()).hexdigest()
 
 

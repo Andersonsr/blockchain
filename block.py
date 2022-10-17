@@ -1,5 +1,5 @@
 import json
-from sys import getsizeof as size
+from sys import getsizeof as sizeof
 from datetime import datetime
 from merkletree import merkle, isPow2
 from transaction import Transaction
@@ -7,20 +7,23 @@ from transaction import Transaction
 class Block:
 
     def __init__(self, transactions, nonce, hash, difficulty, previous=None, root=None,
-                 timestamp=datetime.now().strftime('%d/%m/%Y,%H:%M:%S')):
+                 timestamp=datetime.now().strftime('%d/%m/%Y,%H:%M:%S'), quantity=0, size=0):
         if isPow2(len(transactions)) and len(transactions) <= 512:
             self.timeStamp = timestamp
             self.nonce = nonce
             self.transactions = transactions
-            self.quantity = len(transactions)
+            self.quantity = quantity
+            if quantity == 0:
+                self.quantity = len(transactions)
             self.hash = hash
             self.previous = previous
             if root is None:
                 root = merkle(transactions)
             self.root = root
             self.difficulty = difficulty
-            self.size = size(self.timeStamp) + size(self.nonce) + size(self.transactions) + size(self.quantity) \
-                             + size(self.hash) * 2 + size(self.root) + size(self.difficulty)
+            self.size = size
+            if size == 0:
+                self.size = sizeof(self.timeStamp) + sizeof(self.nonce) + sizeof(self.transactions) + sizeof(self.quantity) + sizeof(self.hash) * 2 + sizeof(self.root) + sizeof(self.difficulty)
 
         else:
             raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512, " +
