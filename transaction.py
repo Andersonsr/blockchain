@@ -12,8 +12,8 @@ class Transaction:
         self.signRecipient = signRecipient
 
     def toString(self):
-        return '{}{}{}{}{}{}'.format(self.origem, self.destino, str(self.valor), self.troco, self.signOrigem,
-                                     self.signDestino)
+        return '{}{}{}{}{}{}'.format(self.sender, self.recipient, str(self.value), self.change, self.signSender,
+                                     self.signRecipient)
 
     def toJson(self):
         return {'sender': self.sender,

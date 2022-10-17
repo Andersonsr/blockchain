@@ -1,6 +1,7 @@
 import os
 import json
 from block import Block
+from transaction import Transaction
 
 class Chain:
     def __init__(self):
@@ -8,7 +9,7 @@ class Chain:
         self.blocks = {}
 
     def addBlock(self, block):
-        block.anterior = self.lastBlock
+        block.previous = self.lastBlock
         self.lastBlock = block.hash
         self.blocks[block.hash] = block
 
@@ -20,6 +21,8 @@ class Chain:
 
     def saveAsJson(self, folder):
         next = self.lastBlock
+        if not os.path.exists('blocks/{}/'.format(folder)):
+            os.makedirs('blocks/{}/'.format(folder))
         file = open('blocks/{}/lastBlock.txt'.format(folder), 'w+')
         file.write(self.lastBlock)
         file.close()
@@ -28,7 +31,7 @@ class Chain:
             file = open('blocks/{}/{}.json'.format(folder, block.hash), 'w+')
             file.write(block.toJson())
             file.close()
-            next = block.anterior
+            next = block.previous
 
     def loadChain(self, folder):
         if not self.blocks:
@@ -42,7 +45,7 @@ class Chain:
                         transactions = []
                         data = json.load(file)
                         for t in data['transactions']:
-                            newT = (t['sender'], t['recipient'], t['value'], t['change'], t['signSender'],
+                            newT = Transaction(t['sender'], t['recipient'], t['value'], t['change'], t['signSender'],
                                     t['signRecipient'])
                             transactions.append(newT)
                         block = Block(transactions=transactions, nonce=data['nonce'], hash=data['hash'],
@@ -56,5 +59,5 @@ class Chain:
             block = self.blocks[next]
             print('bloco:')
             print(block.toString())
-            next = block.anterior
+            next = block.previous
 

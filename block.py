@@ -6,8 +6,8 @@ from transaction import Transaction
 
 class Block:
 
-    def __init__(self, transactions, nonce, hash, difficulty, previous=None, root=merkle(transactions),
-                 timestamp=datetime.now().strftime('%d%m%Y')):
+    def __init__(self, transactions, nonce, hash, difficulty, previous=None, root=None,
+                 timestamp=datetime.now().strftime('%d/%m/%Y,%H:%M:%S')):
         if isPow2(len(transactions)) and len(transactions) <= 512:
             self.timeStamp = timestamp
             self.nonce = nonce
@@ -15,17 +15,20 @@ class Block:
             self.quantity = len(transactions)
             self.hash = hash
             self.previous = previous
+            if root is None:
+                root = merkle(transactions)
             self.root = root
             self.difficulty = difficulty
-            self.size = size(self.timeStamp) + size(self.nonce) + size(transactions) + size(self.quantidade) \
-                             + size(self.hash) * 2 + size(self.raizMerkle) + size(dificuldade)
+            self.size = size(self.timeStamp) + size(self.nonce) + size(self.transactions) + size(self.quantity) \
+                             + size(self.hash) * 2 + size(self.root) + size(self.difficulty)
 
         else:
-            raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512")
+            raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512, " +
+                            "encontrado {}".format(len(transactions)))
 
     def toString(self):
         return 'timestamp: {} hash: {} nonce: {} root: {} transactions: {} size: {}'.format(
-            self.timeStamp, self.hash, self.nonce, self.raizMerkle, self.quantidade, self.blockSize)
+            self.timeStamp, self.hash, self.nonce, self.root, self.quantity, self.size)
 
     def toJson(self):
         return json.dumps({'timeStamp': self.timeStamp,
