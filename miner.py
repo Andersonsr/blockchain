@@ -1,6 +1,4 @@
-
 from hashlib import sha256
-
 
 
 class Miner:

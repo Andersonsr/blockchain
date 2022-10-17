@@ -1,5 +1,6 @@
 import os
 import json
+from block import Block
 
 class Chain:
     def __init__(self):
@@ -36,9 +37,18 @@ class Chain:
             file.close()
             files = os.listdir('blocks/{}/'.format(folder))
             for filename in files:
-                data = json.load('blocks/{}/{}'.format(folder, filename))
-                print(data)
-
+                if '.json' in filename:
+                    with open('blocks/{}/{}'.format(folder, filename)) as file:
+                        transactions = []
+                        data = json.load(file)
+                        for t in data['transactions']:
+                            newT = (t['sender'], t['recipient'], t['value'], t['change'], t['signSender'],
+                                    t['signRecipient'])
+                            transactions.append(newT)
+                        block = Block(transactions=transactions, nonce=data['nonce'], hash=data['hash'],
+                                      difficulty=data['difficulty'], timestamp=data['timeStamp'],
+                                      previous=data['previous'], root=data['root'])
+                        self.blocks[block.hash] = block
 
     def printAll(self):
         next = self.lastBlock

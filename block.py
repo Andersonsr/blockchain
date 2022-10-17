@@ -6,36 +6,37 @@ from transaction import Transaction
 
 class Block:
 
-    def __init__(self, transactions, nonce, hash, dificuldade):
+    def __init__(self, transactions, nonce, hash, difficulty, previous=None, root=merkle(transactions),
+                 timestamp=datetime.now().strftime('%d%m%Y')):
         if isPow2(len(transactions)) and len(transactions) <= 512:
-            self.timeStamp = datetime.now().strftime('%d%m%Y')
+            self.timeStamp = timestamp
             self.nonce = nonce
             self.transactions = transactions
-            self.quantidade = len(transactions)
+            self.quantity = len(transactions)
             self.hash = hash
-            self.anterior = None
-            self.raizMerkle = merkle(transactions)
-            self.dificuldade = dificuldade
-            self.blockSize = size(self.timeStamp) + size(self.nonce) + size(transactions) + size(self.quantidade) \
+            self.previous = previous
+            self.root = root
+            self.difficulty = difficulty
+            self.size = size(self.timeStamp) + size(self.nonce) + size(transactions) + size(self.quantidade) \
                              + size(self.hash) * 2 + size(self.raizMerkle) + size(dificuldade)
 
         else:
             raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512")
 
     def toString(self):
-        return 'timestamp: {} hash: {} nonce: {} root: {} blocks: {} size: {}'.format(
+        return 'timestamp: {} hash: {} nonce: {} root: {} transactions: {} size: {}'.format(
             self.timeStamp, self.hash, self.nonce, self.raizMerkle, self.quantidade, self.blockSize)
 
     def toJson(self):
-        return json.dumps({'timestamp': self.timeStamp,
+        return json.dumps({'timeStamp': self.timeStamp,
                            'nonce': self.nonce,
                            'transactions': [t.toJson() for t in self.transactions],
-                           'quantidade': self.quantidade,
+                           'quantity': self.quantity,
                            'hash': self.hash,
-                           'anterior': self.anterior,
-                           'raiz': self.raizMerkle,
-                           'dificuldade': self.dificuldade,
-                           'size': self.blockSize
+                           'previous': self.previous,
+                           'root': self.root,
+                           'difficulty': self.difficulty,
+                           'size': self.size
                            },
                           indent=4,
                           )
