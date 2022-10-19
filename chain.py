@@ -5,11 +5,11 @@ from transaction import Transaction
 
 class Chain:
     def __init__(self):
-        self.lastBlock = ''
+        self.lastBlock = '0'
         self.blocks = {}
 
     def addBlock(self, block):
-        block.previous = self.lastBlock
+        block.previousHash = self.lastBlock
         self.lastBlock = block.hash
         self.blocks[block.hash] = block
 
@@ -19,25 +19,30 @@ class Chain:
     def getLastBllock(self):
         return self.blocks[self.lastBlock]
 
+    def searchLastBlock(self):
+        next = "0"
+        oldNext = ''
+        while next != oldNext:
+            oldNext = next
+            for key in self.blocks:
+                if self.blocks[key].previousHash == next:
+                    next = self.blocks[key].hash
+
+        self.lastBlock = next
+
     def saveAsJson(self, folder):
         next = self.lastBlock
         if not os.path.exists('blocks/{}/'.format(folder)):
             os.makedirs('blocks/{}/'.format(folder))
-        file = open('blocks/{}/lastBlock.txt'.format(folder), 'w+')
-        file.write(self.lastBlock)
-        file.close()
-        while next != '':
+        while next != '0':
             block = self.blocks[next]
             file = open('blocks/{}/{}.json'.format(folder, block.hash), 'w+')
             file.write(block.toJson())
             file.close()
-            next = block.previous
+            next = block.previousHash
 
     def loadChain(self, folder):
         if not self.blocks:
-            file = open('blocks/{}/lastBlock.txt'.format(folder))
-            self.lastBlock = file.readline()
-            file.close()
             files = os.listdir('blocks/{}/'.format(folder))
             for filename in files:
                 if '.json' in filename:
@@ -45,20 +50,21 @@ class Chain:
                         transactions = []
                         data = json.load(file)
                         for t in data['transactions']:
-                            newT = Transaction(t['sender'], t['recipient'], t['value'], t['change'], t['signSender'],
-                                    t['signRecipient'])
+                            newT = Transaction(t['sender'], t['receiver'], t['value'], t['change'], t['senderSignature'],
+                                    t['receiverSignature'])
                             transactions.append(newT)
                         block = Block(transactions, data['difficulty'], data['version'], nonce=data['nonce'],
                                       hash=data['hash'], timestamp=data['timeStamp'],
-                                      previous=data['previous'], root=data['root'], quantity=data['quantity'],
-                                      size=data['size'])
+                                      previousHash=data['previousHash'], merkleRoot=data['merkleRoot'],
+                                      transactionsNumb=data['transactionsNumb'], size=data['size'])
                         self.blocks[block.hash] = block
+            self.searchLastBlock()
 
     def printAll(self):
         next = self.lastBlock
-        while next != '':
+        while next != '0':
             block = self.blocks[next]
             print('bloco:')
             print(block.toString())
-            next = block.previous
+            next = block.previousHash
 

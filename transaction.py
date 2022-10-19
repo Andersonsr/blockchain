@@ -3,27 +3,24 @@ import json
 
 class Transaction:
 
-    def __init__(self, sender, recipient, value, change, signSender, signRecipient):
+    def __init__(self, sender, receiver, value, change, senderSignature, receiverSignature):
         self.sender = sender
-        self.recipient = recipient
+        self.receiver = receiver
         self.value = value
         self.change = change
-        self.signSender = signSender
-        self.signRecipient = signRecipient
+        self.senderSignature = senderSignature
+        self.receiverSignature = receiverSignature
 
     def toString(self):
-        return '{}{}{}{}{}{}'.format(self.sender, self.recipient, str(self.value), self.change, self.signSender,
-                                     self.signRecipient)
+        return '{}{}{}{}{}{}'.format(self.sender, self.receiver, str(self.value), self.change, self.senderSignature,
+                                     self.receiverSignature)
 
     def toJson(self):
-        return {'sender': self.sender,
-                'recipient': self.recipient,
+        return {
+                'sender': self.sender,
+                'receiver': self.receiver,
                 'value': self.value,
                 'change': self.change.decode(),
-                'signSender': self.signSender,
-                'signRecipient': self.signRecipient}
-
-
-if __name__ == '__main__':
-    t1 = Transaction('1234543', 'dedasdeasd', 18.1, 'daedjkljkd', 'dadeokogj', 'lkjoeas')
-    print(t1.toJson())
+                'senderSignature': self.senderSignature,
+                'receiverSignature': self.receiverSignature
+                }
