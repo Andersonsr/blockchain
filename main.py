@@ -20,15 +20,15 @@ if __name__ == '__main__':
     parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximo de transacoes por bloco')
     args = parser.parse_args()
 
-    miner = Miner()
     manager = Manager()
     manager.loadUsers()
     blockChain = Chain()
+    version = '1.0a'
 
     if args.input == '':
         for i in range(args.blocks):
             if not (isPow2(args.minTransactions) and isPow2(args.maxTransactions)):
-                raise Exception("o numero maximo e minimo de transacoes precisa ser potencia de 2")
+                raise Exception("o numero maximo e minimo de transacoes devem ser potencia de 2")
 
             quantity = 2**(randint(int(log2(args.minTransactions)), int(log2(args.maxTransactions))))
             difficulty = int(randint(args.minDifficulty, args.maxDifficulty))
@@ -42,8 +42,7 @@ if __name__ == '__main__':
                                                 sender.pubKeyAsAddress(), sender.sign(message.encode()),
                                                 receiver.sign(message.encode())))
 
-            nonce, digest = miner.mine(transactions, difficulty)
-            blockChain.addBlock(Block(transactions=transactions, nonce=nonce, hash=digest, difficulty=difficulty))
+            blockChain.addBlock(Block(transactions, difficulty, version))
 
         blockChain.printAll()
 

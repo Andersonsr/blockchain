@@ -9,15 +9,13 @@ class Miner:
                 return False
         return True
 
-    def mine(self, transactions, dificulade):
+    def mine(self, timeStamp, root, quantity, size, difficulty):
         nonce = 0
-        input = ''
-        for t in transactions:
-            input += t.toString()
+        input = timeStamp+root+str(quantity)+str(size)
 
         while True:
-            digest = sha256((input+str(nonce)).encode()).hexdigest()
-            if self.check(digest, dificulade):
+            digest = sha256((str(nonce)+input).encode()).hexdigest()
+            if self.check(digest, difficulty):
                 return nonce, digest
             nonce += 1
 

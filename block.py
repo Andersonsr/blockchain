@@ -3,27 +3,41 @@ from sys import getsizeof as sizeof
 from datetime import datetime
 from merkletree import merkle, isPow2
 from transaction import Transaction
+from miner import Miner
 
 class Block:
 
-    def __init__(self, transactions, nonce, hash, difficulty, previous=None, root=None,
+    def __init__(self, transactions, difficulty, version,  hash=None, nonce=None, previous=None, root=None,
                  timestamp=datetime.now().strftime('%d/%m/%Y,%H:%M:%S'), quantity=0, size=0):
         if isPow2(len(transactions)) and len(transactions) <= 512:
+            miner = Miner()
+            self.version = version
             self.timeStamp = timestamp
-            self.nonce = nonce
+            self.nonce = nonce  # int 1
+            self.hash = hash  # hash 1
             self.transactions = transactions
-            self.quantity = quantity
+            self.quantity = quantity  # int 2
+            self.previous = previous  # hash 2
+            self.root = root  # hash 3
+            self.difficulty = difficulty  # int 3
+            self.size = size  # int 4
+
             if quantity == 0:
                 self.quantity = len(transactions)
-            self.hash = hash
-            self.previous = previous
+
             if root is None:
-                root = merkle(transactions)
-            self.root = root
-            self.difficulty = difficulty
-            self.size = size
+                self.root = merkle(transactions)
+
             if size == 0:
-                self.size = sizeof(self.timeStamp) + sizeof(self.nonce) + sizeof(self.transactions) + sizeof(self.quantity) + sizeof(self.hash) * 2 + sizeof(self.root) + sizeof(self.difficulty)
+                self.size = sizeof(self.timeStamp) + sizeof(self.version) + sizeof(int) * 4 + sizeof(transactions) \
+                            + sizeof(root) * 3
+
+            if nonce is None:
+                nonce, digest = miner.mine(self.timeStamp, self.root, self.quantity, self.size, self.difficulty)
+                self.nonce = nonce
+                self.hash = digest
+
+
 
         else:
             raise Exception("o numero de transacoes precisa ser potencia de 2, entre 2 e 512, " +
@@ -34,15 +48,16 @@ class Block:
             self.timeStamp, self.hash, self.nonce, self.root, self.quantity, self.size)
 
     def toJson(self):
-        return json.dumps({'timeStamp': self.timeStamp,
+        return json.dumps({'version': self.version,
+                           'timeStamp': self.timeStamp,
                            'nonce': self.nonce,
-                           'transactions': [t.toJson() for t in self.transactions],
                            'quantity': self.quantity,
                            'hash': self.hash,
                            'previous': self.previous,
                            'root': self.root,
                            'difficulty': self.difficulty,
-                           'size': self.size
+                           'size': self.size,
+                           'transactions': [t.toJson() for t in self.transactions]
                            },
                           indent=4,
                           )

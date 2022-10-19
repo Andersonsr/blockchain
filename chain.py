@@ -48,8 +48,8 @@ class Chain:
                             newT = Transaction(t['sender'], t['recipient'], t['value'], t['change'], t['signSender'],
                                     t['signRecipient'])
                             transactions.append(newT)
-                        block = Block(transactions=transactions, nonce=data['nonce'], hash=data['hash'],
-                                      difficulty=data['difficulty'], timestamp=data['timeStamp'],
+                        block = Block(transactions, data['difficulty'], data['version'], nonce=data['nonce'],
+                                      hash=data['hash'], timestamp=data['timeStamp'],
                                       previous=data['previous'], root=data['root'], quantity=data['quantity'],
                                       size=data['size'])
                         self.blocks[block.hash] = block
