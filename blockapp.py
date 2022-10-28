@@ -1,14 +1,84 @@
 import os
-from flask import Flask
+from math import log2
+from random import randint
+
+from flask import Flask, request
 import json
+
+from anderson_rosa.block import Block
+from anderson_rosa.chain import Chain
+from anderson_rosa.transaction import Transaction
+from anderson_rosa.userManager import Manager
 
 blockApp = Flask('BlockApp')
 
 
 @blockApp.route("/")
 def homepage():
-    return "<a href=\'blockchains/\'><p>read blockchain</p></a>" \
-           "<p>create blockchain</p>"
+    return "<h1>Blockchain App</h1>" \
+           "<a href=\'blockchains/\'><p>read blockchain</p></a>" \
+           "<a href=\'/create/\'><p>create blockchain</p></a>"
+
+
+@blockApp.route("/create/")
+def creation():
+    content = '<a href=\'/\'><h1>Blockchain App</h1></a>' \
+              '<h2>Create Blockchain</h2>' \
+              '<form action=\'/create/handle/\' method=\'post\'>' \
+              '<label for=\'name\'>Blockchain name</label>' \
+              '<input type=\'text\' id=\'name\' name=\'name\'>' \
+              '<label for=\'min-block-size\'> Min transactions per block</label>' \
+              '<select id=\'min-block-size\' name=\'min-block-size\'>'
+    for i in range(1, 10):
+        content += '<option value=\'{}\'>{}</option>'.format(2 ** i, 2 ** i)
+    content += '</select>' \
+               '<label for=\'max-block-size\'>Max transactions per block</label>' \
+               '<select id=\'max-block-size\' name=\'max-block-size\'>'
+    for i in range(1, 10):
+        content += '<option value=\'{}\'>{}</option>'.format(2 ** i, 2 ** i)
+    content += '</select>' \
+               '<label for=\'number\'>blocks quantity</label>' \
+               '<input type=\'number\' id=\'blocks\' name=\'blocks\'min=\'2\' max=\'100\'' \
+               '<label for=\'min-difficulty\'>Min difficulty</label>' \
+               '<input type=\'number\' id=\'min-difficulty\' name=\'min-difficulty\'min=\'1\' max=\'7\'>' \
+               '<label for=\'max-difficulty\'>Max difficulty</label>' \
+               '<input type=\'number\' id=\'max-difficulty\' name=\'max-difficulty\' min=\'1\' max=\'7\'>' \
+               '<button type=\'submit\'>Submit</button>' \
+               '</form>'
+
+    return content
+
+
+@blockApp.route("/create/handle/", methods=['GET', 'POST'])
+def handleform():
+    manager = Manager()
+    manager.loadUsers()
+    blockChain = Chain()
+    version = '1.0a'
+    tMin = request.form.get("min-block-size")
+    tMax = request.form.get("max-block-size")
+    diffMin = request.form.get("min-difficulty")
+    diffMax = request.form.get("max-difficulty")
+    chainName = request.form.get("name")
+    blocks = request.form.get("blocks")
+
+    for i in range(blocks):
+        quantity = 2 ** (randint(int(log2(tMin)), int(log2(tMax))))
+        difficulty = int(randint(diffMin, diffMax))
+        transactions = []
+        for j in range(quantity):
+            valor = randint(100, 100000) / 10
+            sender = manager.randomUser()
+            receiver = manager.randomUser()
+            message = sender.pubKeyPEM() + receiver.pubKeyPEM() + str(valor) + sender.pubKeyAsAddress().decode()
+            transactions.append(Transaction(sender.pubKeyPEM(), receiver.pubKeyPEM(), valor,
+                                            sender.pubKeyAsAddress(), sender.sign(message.encode()),
+                                            receiver.sign(message.encode())))
+
+        blockChain.addBlock(Block(transactions, difficulty, version))
+        blockChain.saveAsJson(chainName)
+
+    return '<p>oi</p>'
 
 
 @blockApp.route("/blockchains/")
@@ -16,17 +86,18 @@ def blockchains():
     content = ''
     for e in os.listdir('blocks/'):
         content += '<a href=\'/blockchains/{}\'><li>{}</li></a>'.format(e, e)
-    return '<h1>blockchains</h1>' + '<ul>' + content + '</ul>'
+    return '<a href=\'/\'><h1>Blockchain App</h1></a><h2>blockchains</h2>' + '<ul>' + content + '</ul>'
 
 
 @blockApp.route("/blockchains/<blockchain>/")
 def chain(blockchain):
     blocks = os.listdir('blocks/{}/'.format(blockchain))
-    content = '<h1>blockchain:{}</h1><ul>'.format(blockchain)
+    content = '<a href=\'/\'><h1>Blockchain App</h1></a>' \
+              '<h2>blockchain:{}</h2><ul>'.format(blockchain)
     for b in blocks:
         with open('blocks/{}/{}'.format(blockchain, b)) as file:
             data = json.load(file)
-            content += '<a href=\'blockchains/{}/{}/\'><li>' \
+            content += '<a href=\'/blockchains/{}/{}/\'><li>' \
                        '<p>hash:{}</p>' \
                        '<p>size:{}B</p>' \
                        '<p>difficulty:{}</p>' \
@@ -45,8 +116,9 @@ def chain(blockchain):
 
 @blockApp.route("/blockchains/<blockchain>/<block>/")
 def block(blockchain, block):
-    content = '<h1>blockchain:{}</h1>'.format(blockchain)
-    content += '<h2>block:{}</h2><ul>'.format(block)
+    content = '<a href=\'/\'><h1>Blockchain App</h1></a>' \
+              '<h2>blockchain:{}</h2>'.format(blockchain)
+    content += '<h3>block:{}</h3><ul>'.format(block)
     with open('blocks/{}/{}.json'.format(blockchain, block)) as file:
         data = json.load(file)
         for t in data['transactions']:
