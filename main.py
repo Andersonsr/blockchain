@@ -18,7 +18,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', dest='input', default='', type=str, help='nome da blockchain de entrada')
     parser.add_argument('-t', dest='minTransactions', default=2, type=int, help='minimo de transacoes por bloco')
     parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximo de transacoes por bloco')
-    parser.add_argument('--interface', dest='runapp', default=False, help='roda interface web',
+    parser.add_argument('--interface', dest='runapp', default=False, help='roda a interface web',
                         action='store_true')
     args = parser.parse_args()
 

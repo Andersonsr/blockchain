@@ -2,13 +2,13 @@ import os
 from math import log2
 from random import randint
 
-from flask import Flask, request
+from flask import Flask, request, redirect
 import json
 
-from anderson_rosa.block import Block
-from anderson_rosa.chain import Chain
-from anderson_rosa.transaction import Transaction
-from anderson_rosa.userManager import Manager
+from block import Block
+from chain import Chain
+from transaction import Transaction
+from userManager import Manager
 
 blockApp = Flask('BlockApp')
 
@@ -55,12 +55,12 @@ def handleform():
     manager.loadUsers()
     blockChain = Chain()
     version = '1.0a'
-    tMin = request.form.get("min-block-size")
-    tMax = request.form.get("max-block-size")
-    diffMin = request.form.get("min-difficulty")
-    diffMax = request.form.get("max-difficulty")
+    tMin = int(request.form.get("min-block-size"))
+    tMax = int(request.form.get("max-block-size"))
+    diffMin = int(request.form.get("min-difficulty"))
+    diffMax = int(request.form.get("max-difficulty"))
     chainName = request.form.get("name")
-    blocks = request.form.get("blocks")
+    blocks = int(request.form.get("blocks"))
 
     for i in range(blocks):
         quantity = 2 ** (randint(int(log2(tMin)), int(log2(tMax))))
@@ -78,7 +78,7 @@ def handleform():
         blockChain.addBlock(Block(transactions, difficulty, version))
         blockChain.saveAsJson(chainName)
 
-    return '<p>oi</p>'
+    return redirect('/blockchains/{}/'.format(chainName))
 
 
 @blockApp.route("/blockchains/")
@@ -93,47 +93,43 @@ def blockchains():
 def chain(blockchain):
     blocks = os.listdir('blocks/{}/'.format(blockchain))
     content = '<a href=\'/\'><h1>Blockchain App</h1></a>' \
-              '<h2>blockchain:{}</h2><ul>'.format(blockchain)
-    for b in blocks:
-        with open('blocks/{}/{}'.format(blockchain, b)) as file:
-            data = json.load(file)
-            content += '<a href=\'/blockchains/{}/{}/\'><li>' \
-                       '<p>hash:{}</p>' \
-                       '<p>size:{}B</p>' \
-                       '<p>difficulty:{}</p>' \
-                       '<p>transactionNumber:{}</p>' \
-                       '<p>merkleRoot:{}</p>' \
-                       '<p>nonce:{}</p>' \
-                       '</li></a>'.format(blockchain, data['hash'], data['hash'],
-                                          data['size'],
-                                          data['difficulty'],
-                                          data['transactionsNumb'],
-                                          data['merkleRoot'],
-                                          data['nonce'])
-    content += '</ul>'
+              '<a href=\'/blockchains/{}\'><h2>blockchain:{}</h2></a><ul>'.format(blockchain, blockchain)
+    chain = Chain(blockchain)
+    chain.loadChain(blockchain)
+    content += chain.toHTML()
     return content
 
 
 @blockApp.route("/blockchains/<blockchain>/<block>/")
 def block(blockchain, block):
     content = '<a href=\'/\'><h1>Blockchain App</h1></a>' \
-              '<h2>blockchain:{}</h2>'.format(blockchain)
-    content += '<h3>block:{}</h3><ul>'.format(block)
+              '<a href=\'/blockchains/{}/\'><h2>blockchain:{}</h2></a>'.format(blockchain, blockchain)
+    content += '<h3>block:{}</h3>'.format(block)
     with open('blocks/{}/{}.json'.format(blockchain, block)) as file:
         data = json.load(file)
+        counter = 0
+        if data['previousHash'] != '0':
+            content += '<a href=\'/blockchains/{}/{}/\'><p>previousBlock</p></a>'.format(blockchain,
+                                                                                                 data['previousHash'])
         for t in data['transactions']:
+            counter += 1
             content += '<li>' \
+                       '<h4>Transaction {}</h4>' \
                        '<p>sender:{}</p>' \
                        '<p>receiver:{}</p>' \
                        '<p>change:{}</p>' \
                        '<p>value:{}</p>' \
                        '<p>senderSignature:{}</p>' \
                        '<p>receiverSignature:{}</p>' \
-                       '</li>'.format(t['sender'],
+                       '</li>'.format(counter,
+                                      t['sender'],
                                       t['receiver'],
                                       t['change'],
                                       t['value'],
                                       t['senderSignature'],
                                       t['receiverSignature'])
         content += '</ul>'
+        if data['previousHash'] != '0':
+            content += '<a href=\'/blockchains/{}/{}/\'><p>previousBlock</p></a>'.format(blockchain,
+                                                                                         data['previousHash'])
     return content

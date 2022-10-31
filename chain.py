@@ -4,9 +4,10 @@ from block import Block
 from transaction import Transaction
 
 class Chain:
-    def __init__(self):
+    def __init__(self, name='no name'):
         self.lastBlock = '0'
         self.blocks = {}
+        self.name = name
 
     def addBlock(self, block):
         block.previousHash = self.lastBlock
@@ -59,6 +60,28 @@ class Chain:
                                       transactionsNumb=data['transactionsNumb'], size=data['size'])
                         self.blocks[block.hash] = block
             self.searchLastBlock()
+
+    def toHTML(self):
+        next = self.lastBlock
+        content = '<ul>'
+        while next != '0':
+            block = self.blocks[next]
+            content += '<a href=\'/blockchains/{}/{}/\'><li>' \
+                       '<p>hash:{}</p>' \
+                       '<p>size:{}B</p>' \
+                       '<p>difficulty:{}</p>' \
+                       '<p>transactionNumber:{}</p>' \
+                       '<p>merkleRoot:{}</p>' \
+                       '<p>nonce:{}</p>' \
+                       '</li></a>'.format(self.name, block.hash,  block.hash,
+                                          block.size,
+                                          block.difficulty,
+                                          block.transactionsNumb,
+                                          block.merkleRoot,
+                                          block.nonce)
+            next = block.previousHash
+
+        return content + '</ul>'
 
     def printAll(self):
         next = self.lastBlock
