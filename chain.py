@@ -38,7 +38,7 @@ class Chain:
         while next != '0':
             block = self.blocks[next]
             file = open('blocks/{}/{}.json'.format(folder, block.hash), 'w+')
-            file.write(block.toJson())
+            file.write(json.dumps(block.toJson(), indent=4))
             file.close()
             next = block.previousHash
 
@@ -57,31 +57,19 @@ class Chain:
                         block = Block(transactions, data['difficulty'], data['version'], nonce=data['nonce'],
                                       hash=data['hash'], timestamp=data['timeStamp'],
                                       previousHash=data['previousHash'], merkleRoot=data['merkleRoot'],
-                                      transactionsNumb=data['transactionsNumb'], size=data['size'])
+                                      transactionsNumber=data['transactionsNumber'], size=data['size'])
                         self.blocks[block.hash] = block
             self.searchLastBlock()
 
-    def toHTML(self):
+    def blocksToJson(self):
         next = self.lastBlock
-        content = '<ul>'
+        content = []
         while next != '0':
             block = self.blocks[next]
-            content += '<a href=\'/blockchains/{}/{}/\'><li>' \
-                       '<p>hash:{}</p>' \
-                       '<p>size:{}B</p>' \
-                       '<p>difficulty:{}</p>' \
-                       '<p>transactionNumber:{}</p>' \
-                       '<p>merkleRoot:{}</p>' \
-                       '<p>nonce:{}</p>' \
-                       '</li></a>'.format(self.name, block.hash,  block.hash,
-                                          block.size,
-                                          block.difficulty,
-                                          block.transactionsNumb,
-                                          block.merkleRoot,
-                                          block.nonce)
+            content.append(block.toJson())
             next = block.previousHash
 
-        return content + '</ul>'
+        return content
 
     def printAll(self):
         next = self.lastBlock

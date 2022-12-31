@@ -8,7 +8,6 @@ import argparse
 from merkletree import isPow2
 from blockapp import blockApp
 
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', dest='minDifficulty', default=2, type=int, help='dificuldade minima')
@@ -18,7 +17,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', dest='input', default='', type=str, help='nome da blockchain de entrada')
     parser.add_argument('-t', dest='minTransactions', default=2, type=int, help='minimo de transacoes por bloco')
     parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximo de transacoes por bloco')
-    parser.add_argument('--interface', dest='runapp', default=False, help='roda a interface web',
+    parser.add_argument('--app', dest='runapp', default=False, help='roda a api',
                         action='store_true')
     args = parser.parse_args()
 
@@ -33,16 +32,18 @@ if __name__ == '__main__':
                 if not (isPow2(args.minTransactions) and isPow2(args.maxTransactions)):
                     raise Exception("o numero maximo e minimo de transacoes devem ser potencia de 2")
 
-                quantity = 2**(randint(int(log2(args.minTransactions)), int(log2(args.maxTransactions))))
+                quantity = 2 ** (randint(int(log2(args.minTransactions)), int(log2(args.maxTransactions))))
                 difficulty = int(randint(args.minDifficulty, args.maxDifficulty))
                 transactions = []
                 for j in range(quantity):
-                    valor = randint(100, 100000)/10
+                    valor = randint(100, 100000) / 10
                     sender = manager.randomUser()
                     receiver = manager.randomUser()
-                    message = sender.pubKeyPEM() + receiver.pubKeyPEM() + str(valor) + sender.pubKeyAsAddress().decode()
-                    transactions.append(Transaction(sender.pubKeyPEM(), receiver.pubKeyPEM(), valor,
-                                                    sender.pubKeyAsAddress(), sender.sign(message.encode()),
+                    message = sender.pubKeyAsAddress().decode() + receiver.pubKeyAsAddress().decode() + str(valor) + \
+                        sender.pubKeyAsAddress().decode()
+                    transactions.append(Transaction(sender.pubKeyAsAddress().decode(),
+                                                    receiver.pubKeyAsAddress().decode(), valor,
+                                                    sender.pubKeyAsAddress().decode(), sender.sign(message.encode()),
                                                     receiver.sign(message.encode())))
 
                 blockChain.addBlock(Block(transactions, difficulty, version))

@@ -5,7 +5,7 @@ from user import User
 
 class Manager:
     def __init__(self):
-        self.usersAddr = listdir('users/')
+        self.usersAddr = listdir('users')
         self.users = []
 
     def randomUser(self):

@@ -20,7 +20,7 @@ class Transaction:
                 'sender': self.sender,
                 'receiver': self.receiver,
                 'value': self.value,
-                'change': self.change.decode(),
+                'change': self.change,
                 'senderSignature': self.senderSignature,
                 'receiverSignature': self.receiverSignature
                 }
