@@ -10,14 +10,14 @@ from blockapp import blockApp
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-d', dest='minDifficulty', default=2, type=int, help='dificuldade minima')
-    parser.add_argument('-m', dest='maxDifficulty', default=5, type=int, help='dificuldade maxima')
-    parser.add_argument('-b', dest='blocks', default=10, type=int, help='numero de blocos')
-    parser.add_argument('-o', dest='output', default='', type=str, help='nome da blockchain de saida')
-    parser.add_argument('-i', dest='input', default='', type=str, help='nome da blockchain de entrada')
-    parser.add_argument('-t', dest='minTransactions', default=2, type=int, help='minimo de transacoes por bloco')
-    parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximo de transacoes por bloco')
-    parser.add_argument('--app', dest='runapp', default=False, help='roda a api',
+    parser.add_argument('-d', dest='minDifficulty', default=2, type=int, help='minimum difficulty')
+    parser.add_argument('-m', dest='maxDifficulty', default=5, type=int, help='maximum difficulty')
+    parser.add_argument('-b', dest='blocks', default=10, type=int, help='number of blocks')
+    parser.add_argument('-o', dest='output', default='', type=str, help='output blockchain name')
+    parser.add_argument('-i', dest='input', default='', type=str, help='blockchain to load')
+    parser.add_argument('-t', dest='minTransactions', default=2, type=int, help='minimum transactions per block')
+    parser.add_argument('-n', dest='maxTransactions', default=512, type=int, help='maximum transaction per block')
+    parser.add_argument('--app', dest='runapp', default=False, help='run the flask app',
                         action='store_true')
     args = parser.parse_args()
 
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         if args.input == '':
             for i in range(args.blocks):
                 if not (isPow2(args.minTransactions) and isPow2(args.maxTransactions)):
-                    raise Exception("o numero maximo e minimo de transacoes devem ser potencia de 2")
+                    raise Exception("the maximum and minimum number of transactions must be power of 2")
 
                 quantity = 2 ** (randint(int(log2(args.minTransactions)), int(log2(args.maxTransactions))))
                 difficulty = int(randint(args.minDifficulty, args.maxDifficulty))
