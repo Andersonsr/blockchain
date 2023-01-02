@@ -20,7 +20,7 @@ def chain(blockchain):
     try:
         chain.loadChain(blockchain)
     except FileNotFoundError:
-        abort(404)
+        abort(status.HTTP_404_NOT_FOUND)
     return json.dumps({'blocks': chain.blocksToJson()}, indent=4), status.HTTP_200_OK
 
 
@@ -34,5 +34,5 @@ def block(blockchain, block):
                 content.append(t)
             return json.dumps({'transactions': content}, indent=4), status.HTTP_200_OK
     except FileNotFoundError:
-        abort(404)
+        abort(status.HTTP_404_NOT_FOUND)
 
